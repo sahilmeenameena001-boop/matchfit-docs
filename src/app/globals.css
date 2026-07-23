@@ -292,6 +292,16 @@ textarea {
   text-decoration: none;
 }
 
+/* OTP code entry */
+.otp-code {
+  text-align: center;
+  font-size: 1.6rem;
+  letter-spacing: 0.5em;
+  font-weight: 700;
+  padding: 14px 12px;
+  text-indent: 0.5em; /* balance the trailing letter-spacing */
+}
+
 /* a field row split left/right (Remember me · Forgot password) */
 .field.between {
   display: flex;
