@@ -32,8 +32,8 @@ npm install -D typescript @types/node @types/react @types/react-dom eslint eslin
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=      # server-only, NEVER in browser code
+NEXT_PUBLIC_SUPABASE_PUBLIC_KEY= # client-safe anon key equivalent
+SUPABASE_SECRET_KEY=      # server-only, NEVER in browser code
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ADMIN_EMAIL=
 ```
