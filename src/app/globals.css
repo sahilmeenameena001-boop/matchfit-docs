@@ -1,0 +1,347 @@
+:root {
+  --navy: #0f2a43;
+  --green: #1f7a4d;
+  --green-dark: #17603c;
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #1b2733;
+  --muted: #5b6670;
+  --rule: #d8dee4;
+  --rule-focus: #1f7a4d;
+  --error: #c0392b;
+  --error-bg: #fdecea;
+  --radius: 12px;
+  --shadow: 0 6px 24px rgba(15, 42, 67, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--green);
+}
+
+/* ---------- Layout shells ---------- */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px 64px;
+}
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.brand .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--green);
+}
+.brand strong {
+  color: var(--navy);
+  letter-spacing: 0.5px;
+}
+h1.title {
+  font-size: 1.5rem;
+  color: var(--navy);
+  margin: 6px 0 2px;
+}
+p.subtitle {
+  color: var(--muted);
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+}
+
+/* ---------- Stepper ---------- */
+.stepper {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.step {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--rule);
+}
+.step.active {
+  background: var(--green);
+}
+.step-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* ---------- Form ---------- */
+.field {
+  margin-bottom: 16px;
+}
+.row {
+  display: flex;
+  gap: 12px;
+}
+.row > .field {
+  flex: 1;
+}
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+label .opt {
+  font-weight: 400;
+  color: var(--muted);
+}
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 0.95rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--rule-focus);
+}
+input.invalid,
+select.invalid,
+textarea.invalid {
+  border-color: var(--error);
+  background: var(--error-bg);
+}
+textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+.hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.err {
+  font-size: 0.78rem;
+  color: var(--error);
+  margin-top: 5px;
+}
+
+/* segmented control (gender, category, foot) */
+.segmented {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.segmented button {
+  flex: 1;
+  min-width: 90px;
+  padding: 10px;
+  border: 1.5px solid var(--rule);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.segmented button.selected {
+  border-color: var(--green);
+  background: #eaf5ee;
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+/* unit toggle */
+.unit-toggle {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  overflow: hidden;
+  font-size: 0.75rem;
+}
+.unit-toggle button {
+  border: 0;
+  background: #fff;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.unit-toggle button.on {
+  background: var(--green);
+  color: #fff;
+}
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* checkbox */
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+/* buttons */
+.btn {
+  width: 100%;
+  padding: 13px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--green-dark);
+}
+.btn-primary:disabled {
+  background: #9db8a9;
+  cursor: not-allowed;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--rule);
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.actions .btn {
+  flex: 1;
+}
+
+.form-error {
+  background: var(--error-bg);
+  color: var(--error);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+.foot-note {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 18px;
+}
+
+/* small text link that looks like a button (e.g. Show/Hide password) */
+.link-btn {
+  border: 0;
+  background: none;
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.link-inline {
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+/* a field row split left/right (Remember me · Forgot password) */
+.field.between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* section sub-heading (e.g. Health & injury) */
+.section-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 8px 0 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.section-label .opt {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* derived readouts (BMI, age) */
+.readout {
+  display: flex;
+  gap: 16px;
+  background: #f0f4f2;
+  border-radius: 9px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--navy);
+}
+.readout b {
+  color: var(--green-dark);
+}
+
+/* success */
+.success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #eaf5ee;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 16px;
+}
+.center {
+  text-align: center;
+}
