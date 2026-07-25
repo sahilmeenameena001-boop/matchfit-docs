@@ -51,6 +51,114 @@ a {
   box-shadow: var(--shadow);
   padding: 32px;
 }
+.card.wide {
+  max-width: 760px;
+}
+
+/* empty state */
+.empty {
+  background: #f0f4f2;
+  border: 1px dashed var(--rule);
+  border-radius: 10px;
+  padding: 22px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* calendar */
+.cal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cal-day {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+}
+.cal-date {
+  min-width: 92px;
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 0.9rem;
+}
+.cal-pillars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pillar-chip {
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef2f5;
+  color: var(--navy);
+  border: 1px solid var(--rule);
+}
+.pillar-chip.completed {
+  background: #eaf5ee;
+  border-color: #bfe0cc;
+  color: var(--green-dark);
+}
+.pillar-chip.cancelled {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* plan grid */
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.plan-cell {
+  background: #f0f4f2;
+  border-radius: 9px;
+  padding: 12px 14px;
+}
+.plan-label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.plan-count {
+  display: block;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* library grid */
+.lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+.lib-card {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  padding: 16px;
+  text-align: center;
+}
+.lib-icon {
+  font-size: 26px;
+}
+.lib-title {
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 0.9rem;
+  margin: 6px 0 2px;
+}
+.lib-kind {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
 .brand {
   display: flex;
   align-items: center;
