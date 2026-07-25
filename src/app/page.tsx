@@ -15,6 +15,9 @@ export default function Home() {
         <Link href="/signup" className="btn btn-primary" style={{ display: "block", textDecoration: "none", paddingTop: 13 }}>
           Get started
         </Link>
+        <p className="foot-note">
+          Staff? <Link href="/dashboard">Open the dashboard</Link>
+        </p>
       </div>
     </main>
   );

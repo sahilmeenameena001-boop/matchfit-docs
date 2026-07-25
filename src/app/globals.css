@@ -55,6 +55,178 @@ a {
   max-width: 760px;
 }
 
+/* ---------- Dashboard shell ---------- */
+.dash {
+  display: flex;
+  min-height: 100vh;
+}
+.dash-sidebar {
+  width: 230px;
+  flex: 0 0 230px;
+  background: var(--navy);
+  color: #fff;
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.dash-brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 28px;
+  padding: 0 8px;
+}
+.dash-brand strong {
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.dash-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dash-nav a {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: #cdd8e0;
+  text-decoration: none;
+  font-size: 0.92rem;
+  transition: background 0.15s, color 0.15s;
+}
+.dash-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.dash-nav a.active {
+  background: var(--green);
+  color: #fff;
+  font-weight: 600;
+}
+.nav-icon {
+  font-size: 1rem;
+}
+.dash-sidebar-foot {
+  margin-top: auto;
+  padding: 12px 12px 0;
+}
+.dash-sidebar-foot a {
+  color: #9db4c4;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+.dash-sidebar-foot a:hover {
+  color: #fff;
+}
+.dash-main {
+  flex: 1;
+  padding: 34px 40px 56px;
+  background: var(--bg);
+  min-width: 0;
+}
+.dash-panel {
+  max-width: 900px;
+}
+.dash-title {
+  font-size: 1.6rem;
+  color: var(--navy);
+  margin: 0 0 4px;
+}
+.dash-sub {
+  color: var(--muted);
+  margin: 0 0 22px;
+  font-size: 0.95rem;
+}
+.dash-h2 {
+  font-size: 1.05rem;
+  color: var(--navy);
+  margin: 28px 0 12px;
+}
+
+/* overview tiles */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+}
+.tile {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 20px;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, transform 0.1s;
+  display: block;
+}
+.tile:hover {
+  border-color: var(--green);
+  transform: translateY(-2px);
+}
+.tile-icon {
+  font-size: 24px;
+}
+.tile-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.2;
+  margin-top: 6px;
+}
+.tile-label {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.ql-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ql-btn {
+  width: auto;
+  padding: 10px 18px;
+  text-decoration: none;
+}
+.btn.auto {
+  width: auto;
+  padding: 12px 22px;
+}
+
+@media (max-width: 720px) {
+  .dash {
+    flex-direction: column;
+  }
+  .dash-sidebar {
+    width: auto;
+    flex: none;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px;
+  }
+  .dash-brand {
+    margin-bottom: 0;
+  }
+  .dash-nav {
+    flex-direction: row;
+  }
+  .dash-sidebar-foot {
+    margin-top: 0;
+    padding: 0;
+  }
+  .dash-main {
+    padding: 20px;
+  }
+}
+
 /* empty state */
 .empty {
   background: #f0f4f2;

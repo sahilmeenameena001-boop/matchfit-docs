@@ -6,10 +6,9 @@
  * will fill (squads / stations / pairings / schedule / movement), then Confirm.
  *
  * Talks to POST /api/plans/generate and GET|PATCH /api/plans/:sessionId.
- * Note: writes require a logged-in staff account (the API enforces this).
+ * Writes require a logged-in staff account (the API enforces this).
  */
 import { useState } from "react";
-import Link from "next/link";
 
 type Plan = {
   session_id: string;
@@ -87,81 +86,69 @@ export default function PlanPage() {
   };
 
   return (
-    <main className="page">
-      <div className="card wide">
-        <div className="brand">
-          <span className="dot" />
-          <strong>MATCHFIT</strong>
+    <div className="dash-panel">
+      <h1 className="dash-title">Session Planning</h1>
+      <p className="dash-sub">Assemble and confirm a session plan. Staff only.</p>
+
+      {msg && <div className="form-error">{msg}</div>}
+
+      <div className="row">
+        <div className="field">
+          <label htmlFor="sid">Session ID</label>
+          <input
+            id="sid"
+            value={sessionId}
+            onChange={(e) => setSessionId(e.target.value)}
+            placeholder="uuid of the session"
+          />
         </div>
-        <h1 className="title">Session Planning</h1>
-        <p className="subtitle">
-          Assemble and confirm a session plan. Staff only.
-        </p>
-
-        {msg && <div className="form-error">{msg}</div>}
-
-        <div className="row">
-          <div className="field">
-            <label htmlFor="sid">Session ID</label>
-            <input
-              id="sid"
-              value={sessionId}
-              onChange={(e) => setSessionId(e.target.value)}
-              placeholder="uuid of the session"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="pdate">Plan date</label>
-            <input
-              id="pdate"
-              type="date"
-              value={planDate}
-              onChange={(e) => setPlanDate(e.target.value)}
-            />
-          </div>
+        <div className="field">
+          <label htmlFor="pdate">Plan date</label>
+          <input
+            id="pdate"
+            type="date"
+            value={planDate}
+            onChange={(e) => setPlanDate(e.target.value)}
+          />
         </div>
-
-        <button className="btn btn-primary" disabled={busy} onClick={generate}>
-          {busy ? "Working…" : "Generate draft plan"}
-        </button>
-
-        {plan && (
-          <>
-            <div className="divider" />
-            <p className="qr-heading">
-              Plan status: <b>{plan.status}</b>
-            </p>
-            <div className="plan-grid">
-              {SECTIONS.map((s) => {
-                const arr = (plan[s.key] as unknown[]) || [];
-                return (
-                  <div key={s.key as string} className="plan-cell">
-                    <span className="plan-label">{s.label}</span>
-                    <span className="plan-count">
-                      {Array.isArray(arr) ? `${arr.length} items` : "—"}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {plan.status !== "confirmed" && (
-              <button
-                className="btn btn-primary"
-                style={{ marginTop: 16 }}
-                disabled={busy}
-                onClick={confirm}
-              >
-                Confirm plan
-              </button>
-            )}
-          </>
-        )}
-
-        <p className="foot-note">
-          <Link href="/">← Back to MatchFIT</Link>
-        </p>
       </div>
-    </main>
+
+      <button className="btn btn-primary auto" disabled={busy} onClick={generate}>
+        {busy ? "Working…" : "Generate draft plan"}
+      </button>
+
+      {plan && (
+        <>
+          <div className="divider" />
+          <p className="qr-heading">
+            Plan status: <b>{plan.status}</b>
+          </p>
+          <div className="plan-grid">
+            {SECTIONS.map((s) => {
+              const arr = (plan[s.key] as unknown[]) || [];
+              return (
+                <div key={s.key as string} className="plan-cell">
+                  <span className="plan-label">{s.label}</span>
+                  <span className="plan-count">
+                    {Array.isArray(arr) ? `${arr.length} items` : "—"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {plan.status !== "confirmed" && (
+            <button
+              className="btn btn-primary auto"
+              style={{ marginTop: 16 }}
+              disabled={busy}
+              onClick={confirm}
+            >
+              Confirm plan
+            </button>
+          )}
+        </>
+      )}
+    </div>
   );
 }
