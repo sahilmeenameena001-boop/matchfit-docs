@@ -45,6 +45,18 @@ export const updatePlanSchema = z.object({
   notes: z.string().trim().max(2000).nullable().optional(),
 });
 
+/* ------------------- Ideation (plan activity -> calendar) ----------------- */
+
+// Ideating a session activity creates a calendar entry for that day,
+// and (if a session is loaded) attaches the idea to that session's plan.
+export const ideationSchema = z.object({
+  pillarNumber: z.number().int().min(1).max(5),
+  scheduledDate: isoDate,
+  title: z.string().trim().min(2, "Give the activity a name").max(120),
+  notes: z.string().trim().max(500).optional(),
+  sessionId: uuid.optional(),
+});
+
 /* --------------------------- 3. Output Library ---------------------------- */
 
 export const createLibrarySchema = z.object({
