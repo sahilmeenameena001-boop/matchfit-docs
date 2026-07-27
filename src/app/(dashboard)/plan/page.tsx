@@ -55,6 +55,18 @@ export default function PlanPage() {
   const [ideaMsg, setIdeaMsg] = useState("");
   const [ideaOk, setIdeaOk] = useState(false);
 
+  // ----- AI ideation -----
+  type AiIdea = {
+    title: string;
+    pillarNumber: number;
+    description: string;
+    coachingPoints: string[];
+  };
+  const [aiFocus, setAiFocus] = useState("");
+  const [aiIdeas, setAiIdeas] = useState<AiIdea[]>([]);
+  const [aiMsg, setAiMsg] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -70,6 +82,39 @@ export default function PlanPage() {
     } catch {
       return { okFlag: false, json: null };
     }
+  };
+
+  // --- AI: ask Claude for ideas ---
+  const askClaude = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAiMsg("");
+    setAiIdeas([]);
+    if (aiFocus.trim().length < 3) {
+      setAiMsg("Describe what you want to work on.");
+      return;
+    }
+    setAiBusy(true);
+    const { okFlag, json } = await call("/api/ideation/ai", "POST", {
+      focus: aiFocus,
+      count: 4,
+    });
+    setAiBusy(false);
+    if (!okFlag) {
+      setAiMsg(json?.error?.message ?? "Could not reach Claude. (Staff login + ANTHROPIC_API_KEY required.)");
+      return;
+    }
+    setAiIdeas(json.data?.ideas ?? []);
+  };
+
+  // Apply an AI suggestion into the ideation form below.
+  const useIdea = (ai: AiIdea) => {
+    setIdea((prev) => ({
+      ...prev,
+      pillar: ai.pillarNumber,
+      title: ai.title,
+      notes: [ai.description, ...(ai.coachingPoints || []).map((p) => `• ${p}`)].join("\n"),
+    }));
+    setAiMsg(`Loaded "${ai.title}" below — set a date and add it to the calendar.`);
   };
 
   // --- A) Ideate -> calendar ---
@@ -158,6 +203,53 @@ export default function PlanPage() {
             placeholder="uuid of the session"
           />
         </div>
+      </div>
+
+      {/* AI ideation with Claude */}
+      <div className="ai-card">
+        <h2 className="dash-h2" style={{ marginTop: 0 }}>🤖 Ideate with Claude</h2>
+        <p className="dash-sub" style={{ marginBottom: 12 }}>
+          Describe a focus and Claude suggests activities you can drop onto the calendar.
+        </p>
+        {aiMsg && <div className={aiIdeas.length ? "info-ok" : "form-error"}>{aiMsg}</div>}
+        <form onSubmit={askClaude} className="ai-row">
+          <input
+            value={aiFocus}
+            onChange={(e) => setAiFocus(e.target.value)}
+            placeholder="e.g. improve weak-foot passing under pressure"
+          />
+          <button className="btn btn-primary auto" disabled={aiBusy} type="submit">
+            {aiBusy ? "Thinking…" : "Suggest ideas"}
+          </button>
+        </form>
+
+        {aiIdeas.length > 0 && (
+          <div className="ai-ideas">
+            {aiIdeas.map((ai, i) => (
+              <div key={i} className="ai-idea">
+                <div className="ai-idea-head">
+                  <span className="ai-pill">P{ai.pillarNumber}</span>
+                  <strong>{ai.title}</strong>
+                </div>
+                <p className="ai-idea-desc">{ai.description}</p>
+                {ai.coachingPoints?.length > 0 && (
+                  <ul className="ai-points">
+                    {ai.coachingPoints.map((p, j) => (
+                      <li key={j}>{p}</li>
+                    ))}
+                  </ul>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-ghost ql-btn"
+                  onClick={() => useIdea(ai)}
+                >
+                  Use this ↓
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* A) Ideation -> Calendar */}

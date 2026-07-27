@@ -36,6 +36,7 @@ NEXT_PUBLIC_SUPABASE_PUBLIC_KEY= # client-safe anon key equivalent
 SUPABASE_SECRET_KEY=      # server-only, NEVER in browser code
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ADMIN_EMAIL=
+ANTHROPIC_API_KEY=        # server-only; powers AI ideation on the planning page
 ```
 
 ---

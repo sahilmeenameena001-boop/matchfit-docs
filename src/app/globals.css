@@ -227,6 +227,69 @@ a {
   }
 }
 
+/* AI ideation card */
+.ai-card {
+  background: #f7f4fb;
+  border: 1px solid #e2d8f0;
+  border-left: 4px solid #7b4dc4;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 12px 0;
+}
+.ai-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ai-row input {
+  flex: 1;
+  min-width: 220px;
+}
+.ai-ideas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.ai-idea {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 14px;
+}
+.ai-idea-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ai-idea-head strong {
+  color: var(--navy);
+  font-size: 0.92rem;
+}
+.ai-pill {
+  background: #7b4dc4;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.ai-idea-desc {
+  font-size: 0.83rem;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+.ai-points {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.ai-points li {
+  margin-bottom: 3px;
+}
+
 /* ideation card + success message */
 .idea-card {
   background: #fff;
