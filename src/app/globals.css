@@ -360,6 +360,26 @@ a {
   opacity: 0.55;
   text-decoration: line-through;
 }
+.chip-btn {
+  border: 0;
+  background: rgba(15, 42, 67, 0.08);
+  color: var(--navy);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  font-size: 0.72rem;
+  margin-left: 6px;
+  cursor: pointer;
+  padding: 0;
+}
+.chip-btn:hover {
+  background: rgba(15, 42, 67, 0.18);
+}
+.chip-btn.danger:hover {
+  background: #fdecea;
+  color: var(--error);
+}
 
 /* plan grid */
 .plan-grid {
