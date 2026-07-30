@@ -55,6 +55,12 @@ export default function DashboardOverview() {
           <div className="tile-label">Assemble a session plan</div>
         </Link>
 
+        <Link href="/matches" className="tile">
+          <div className="tile-icon">⚽</div>
+          <div className="tile-value">P4</div>
+          <div className="tile-label">Rotations &amp; match schedule</div>
+        </Link>
+
         <Link href="/library" className="tile">
           <div className="tile-icon">📚</div>
           <div className="tile-value">{counts.library}</div>
@@ -67,6 +73,7 @@ export default function DashboardOverview() {
         <div className="ql-row">
           <Link href="/calendar" className="btn btn-ghost ql-btn">View calendar</Link>
           <Link href="/plan" className="btn btn-ghost ql-btn">Plan a session</Link>
+          <Link href="/matches" className="btn btn-ghost ql-btn">Plan match day</Link>
           <Link href="/library" className="btn btn-ghost ql-btn">Browse library</Link>
         </div>
       </div>

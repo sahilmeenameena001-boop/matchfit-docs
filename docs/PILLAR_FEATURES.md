@@ -37,9 +37,10 @@ schedule, movement) then confirms it. Confirmed plans are public.
   | `GET /api/plans/:sessionId` | Public (confirmed) | View the plan |
   | `PATCH /api/plans/:sessionId` | Staff | Edit fields / confirm / archive |
 
-> **Engine TODO:** `POST /api/plans/generate` currently creates an *empty* draft. Wire the
-> allocation / scheduler / pairing engine (see the Five-Pillar logic spec) to pre-fill the
-> jsonb sections.
+> **Engine TODO:** `POST /api/plans/generate` currently creates an *empty* draft. The
+> Pillar 4 engine (rotations + match scheduling — see [PILLAR4_ENGINE.md](PILLAR4_ENGINE.md))
+> is ready to pre-fill `squads` / `match_schedule` once squad rosters live in the DB;
+> stations / pairings engines are still pending.
 
 ---
 

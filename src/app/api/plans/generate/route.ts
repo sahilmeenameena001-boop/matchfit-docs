@@ -8,9 +8,10 @@ import { generatePlanSchema } from "@/lib/validation/pillarFeatures";
  * POST /api/plans/generate   (staff)
  *   Creates (or resets) a DRAFT plan for a session.
  *
- * TODO (engine): once the allocation/scheduler/pairing engine exists
- * (see the Five-Pillar logic spec), pre-fill squads/stations/pairings/
- * match_schedule/movement_plan here instead of empty defaults.
+ * TODO (engine): the Pillar 4 engine (src/lib/pillar4 — rotation +
+ * match scheduling) is ready; once squad rosters live in the DB, call
+ * planRotation/scheduleMatches here to pre-fill squads/match_schedule
+ * instead of empty defaults. Stations/pairings engines still pending.
  */
 export async function POST(req: NextRequest) {
   const staff = await getStaff();
