@@ -33,6 +33,8 @@ const SKILLS: { value: SkillFocus; label: string }[] = [
   { value: "awareness", label: "Awareness" },
 ];
 
+const skillLabel = (v: string) => SKILLS.find((s) => s.value === v)?.label ?? v;
+
 const EQUIPMENT = ["cones", "balls", "bibs", "goals"];
 const DIFFICULTIES: DifficultyTier[] = [
   "foundation",
@@ -58,6 +60,9 @@ const num = (v: string, fallback: number) => {
 
 const toggle = <T,>(list: T[], item: T): T[] =>
   list.includes(item) ? list.filter((x) => x !== item) : [...list, item];
+
+const medalClass = (rank: number) =>
+  rank <= 3 ? `medal m${rank}` : "medal";
 
 export default function DrillsPage() {
   /* ---------------------- §5.3 challenge picker ---------------------- */
@@ -116,6 +121,9 @@ export default function DrillsPage() {
   const setPlayerField = (i: number, patch: Partial<(typeof players)[number]>) =>
     setPlayers((rows) => rows.map((r, j) => (j === i ? { ...r, ...patch } : r)));
 
+  const resetAttempts = () =>
+    setPlayers((rows) => rows.map((r) => ({ ...r, attempts: [] })));
+
   const squadScore = useMemo(() => {
     try {
       return scoreSquadChallenge({
@@ -165,9 +173,6 @@ export default function DrillsPage() {
     [xpRows]
   );
 
-  const challengeName = (id: string) =>
-    CHALLENGE_CATALOG.find((c) => c.id === id)?.name ?? id;
-
   return (
     <div className="dash-panel">
       <h1 className="dash-title">Gamified Drills</h1>
@@ -178,15 +183,19 @@ export default function DrillsPage() {
 
       {/* ---------------------- §5.3 challenge picker -------------------- */}
       <form
-        className="idea-card"
+        className="pw-card"
         onSubmit={(e) => {
           e.preventDefault();
           generateSelection();
         }}
       >
-        <h2 className="dash-h2" style={{ marginTop: 0 }}>
-          1 · Pick today&apos;s games
-        </h2>
+        <div className="pw-cardhead">
+          <span className="pw-step">1</span>
+          <h2>Pick today&apos;s games</h2>
+        </div>
+        <p className="pw-cardsub">
+          Score = relevance + player need + novelty + equipment fit − fatigue risk.
+        </p>
         {selErr && <div className="form-error">{selErr}</div>}
 
         <label>Session focus (programme relevance)</label>
@@ -295,23 +304,35 @@ export default function DrillsPage() {
             {selection.selected.map((s) => (
               <div className="p2-pickcard" key={s.challenge.id}>
                 <div className="p2-pickhead">
-                  <h3>
-                    {s.order} · {s.challenge.name}
-                  </h3>
+                  <span className="pick-rank">
+                    <span className={medalClass(s.order)}>{s.order}</span>
+                    <h3>{s.challenge.name}</h3>
+                    <span
+                      className={`dot ${s.challenge.intensity}`}
+                      title={`${s.challenge.intensity} intensity`}
+                    />
+                  </span>
                   <span className="pillar-chip">
                     <b>score {s.score.total.toFixed(2)}</b>
                   </span>
                 </div>
                 <p className="p2-desc">{s.challenge.description}</p>
+                <div className="tagline">
+                  {s.challenge.skillFocus.map((sk) => (
+                    <span className="tag" key={sk}>
+                      {skillLabel(sk)}
+                    </span>
+                  ))}
+                  <span className="tag">{s.challenge.mechanics.length} mechanics</span>
+                  <span className="tag">{s.challenge.space} space</span>
+                  <span className="tag">{s.challenge.equipment.join(" · ")}</span>
+                </div>
                 <div className="p4-chips">
                   <span className="pillar-chip">relevance {s.score.relevance.toFixed(2)}</span>
                   <span className="pillar-chip">need {s.score.need.toFixed(2)}</span>
                   <span className="pillar-chip">novelty {s.score.novelty.toFixed(2)}</span>
                   <span className="pillar-chip">fit {s.score.equipmentFit.toFixed(2)}</span>
                   <span className="pillar-chip">fatigue −{s.score.fatigueRisk.toFixed(2)}</span>
-                  <span className="pillar-chip">
-                    {s.challenge.intensity} intensity · {s.challenge.mechanics.length} mechanics
-                  </span>
                 </div>
                 {s.warnings.map((w, i) => (
                   <div className="form-error" key={i}>
@@ -333,142 +354,121 @@ export default function DrillsPage() {
       </form>
 
       {/* -------------------- §5.5/5.6 live squad scoring ----------------- */}
-      <div className="idea-card">
-        <h2 className="dash-h2" style={{ marginTop: 0 }}>
-          2 · Score the squad live
-        </h2>
-        <p className="p2-desc">
-          Tap attempts as they happen. Incorrect attempts earn nothing, low-risk
-          spam diminishes after 3, bonuses cap at ×1.5, and the difficulty tier
-          multiplies the raw score (0.80 / 1.00 / 1.15 / 1.30).
+      <div className="pw-card">
+        <div className="pw-cardhead">
+          <span className="pw-step">2</span>
+          <h2>Score the squad live</h2>
+        </div>
+        <p className="pw-cardsub">
+          Tap attempts as they happen — misses earn nothing, low-risk spam
+          diminishes after 3, bonuses cap at ×1.5, difficulty multiplies
+          (0.80 / 1.00 / 1.15 / 1.30).
         </p>
 
-        <div className="p4-scroll">
-          <table className="p4-table">
-            <thead>
-              <tr>
-                <th className="name-cell">Player</th>
-                <th>Difficulty</th>
-                <th>Attempts</th>
-                <th>✓ / ✗</th>
-                <th>Raw</th>
-                <th>Adjusted</th>
-              </tr>
-            </thead>
-            <tbody>
-              {players.map((p, i) => {
-                const result = squadScore?.players[i];
-                return (
-                  <tr key={i}>
-                    <td className="name-cell">
-                      <input
-                        aria-label={`Player ${i + 1} name`}
-                        value={p.name}
-                        onChange={(e) => setPlayerField(i, { name: e.target.value })}
-                        style={{ minWidth: 110 }}
-                      />
-                    </td>
-                    <td>
-                      <select
-                        aria-label={`Player ${i + 1} difficulty`}
-                        value={p.difficulty}
-                        onChange={(e) =>
-                          setPlayerField(i, {
-                            difficulty: e.target.value as DifficultyTier,
-                          })
-                        }
-                      >
-                        {DIFFICULTIES.map((d) => (
-                          <option key={d} value={d}>
-                            {d}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <div className="p2-attempt-btns">
-                        <button type="button" onClick={() => addAttempt(i, { correct: true })}>
-                          ✓ Good
-                        </button>
-                        <button
-                          type="button"
-                          title="Safe action — diminishes when spammed"
-                          onClick={() => addAttempt(i, { correct: true, risk: "low" })}
-                        >
-                          ✓ Low-risk
-                        </button>
-                        <button
-                          type="button"
-                          title="Bonus target hit (×2, capped ×1.5)"
-                          onClick={() =>
-                            addAttempt(i, { correct: true, bonusMultiplier: 2 })
-                          }
-                        >
-                          ✓ Bonus
-                        </button>
-                        <button type="button" onClick={() => addAttempt(i, { correct: false })}>
-                          ✗ Miss
-                        </button>
-                        <button
-                          type="button"
-                          title="Undo last attempt"
-                          onClick={() => undoAttempt(i)}
-                          disabled={p.attempts.length === 0}
-                        >
-                          ↺
-                        </button>
-                      </div>
-                    </td>
-                    <td>
-                      {result ? `${result.counted} / ${result.ignored}` : "0 / 0"}
-                    </td>
-                    <td>{result ? result.rawPoints : 0}</td>
-                    <td>
-                      <b>{result ? result.adjustedScore : 0}</b>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="pcard-grid">
+          {players.map((p, i) => {
+            const result = squadScore?.players[i];
+            return (
+              <div className={`pcard ${result?.metParticipation ? "done" : ""}`} key={i}>
+                <div className="pcard-top">
+                  <input
+                    aria-label={`Player ${i + 1} name`}
+                    value={p.name}
+                    onChange={(e) => setPlayerField(i, { name: e.target.value })}
+                  />
+                  <select
+                    aria-label={`Player ${i + 1} difficulty`}
+                    value={p.difficulty}
+                    onChange={(e) =>
+                      setPlayerField(i, {
+                        difficulty: e.target.value as DifficultyTier,
+                      })
+                    }
+                  >
+                    {DIFFICULTIES.map((d) => (
+                      <option key={d} value={d}>
+                        {d} ×{{ foundation: 0.8, standard: 1, competitive: 1.15, advanced: 1.3 }[d]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="tap-row">
+                  <button type="button" className="tap good"
+                    onClick={() => addAttempt(i, { correct: true })}>
+                    ✓ Good
+                  </button>
+                  <button type="button" className="tap low"
+                    title="Safe action — diminishes when spammed"
+                    onClick={() => addAttempt(i, { correct: true, risk: "low" })}>
+                    ✓ Low-risk
+                  </button>
+                  <button type="button" className="tap bonus"
+                    title="Bonus target hit (×2, capped ×1.5)"
+                    onClick={() => addAttempt(i, { correct: true, bonusMultiplier: 2 })}>
+                    ★ Bonus
+                  </button>
+                  <button type="button" className="tap miss"
+                    onClick={() => addAttempt(i, { correct: false })}>
+                    ✗ Miss
+                  </button>
+                  <button type="button" className="tap undo"
+                    title="Undo last attempt"
+                    onClick={() => undoAttempt(i)}
+                    disabled={p.attempts.length === 0}>
+                    ↺
+                  </button>
+                </div>
+                <div className="pcard-stats">
+                  <span>
+                    attempts <b>{result ? `${result.counted} ✓ / ${result.ignored} ✗` : "0 / 0"}</b>
+                  </span>
+                  <span>
+                    raw <b>{result ? result.rawPoints : 0}</b>
+                  </span>
+                  <span>
+                    adjusted <b>{result ? result.adjustedScore : 0}</b>
+                  </span>
+                </div>
+                {result?.notes.map((n, k) => (
+                  <div className="pcard-note" key={k}>
+                    {n}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
 
         {squadScore && (
-          <>
-            <div className="p4-chips">
-              <span className="pillar-chip">
-                <b>squad total {squadScore.squadTotal}</b>
-              </span>
-              <span
-                className={`p4-badge ${squadScore.participation.met ? "ok" : "bad"}`}
-              >
-                {squadScore.participation.met
-                  ? "participation met"
-                  : `waiting on: ${squadScore.participation.missing
-                      .map((id) => players[Number(id.slice(1)) - 1]?.name ?? id)
-                      .join(", ")}`}
-              </span>
-            </div>
-            {squadScore.players
-              .flatMap((p) => p.notes.map((n) => `${p.name}: ${n}`))
-              .map((n, i) => (
-                <p className="p2-desc" key={i} style={{ margin: "2px 0" }}>
-                  {n}
-                </p>
-              ))}
-          </>
+          <div className="pw-banner">
+            <span>
+              <span className="big">{squadScore.squadTotal}</span>{" "}
+              <span className="lbl">squad total</span>
+            </span>
+            <span className={`p4-badge ${squadScore.participation.met ? "ok" : "bad"}`}>
+              {squadScore.participation.met
+                ? "✓ participation met"
+                : `waiting on: ${squadScore.participation.missing
+                    .map((id) => players[Number(id.slice(1)) - 1]?.name ?? id)
+                    .join(", ")}`}
+            </span>
+            <button type="button" className="btn btn-ghost auto" onClick={resetAttempts}>
+              Reset round
+            </button>
+          </div>
         )}
       </div>
 
       {/* ---------------------------- §5.7 XP board ----------------------- */}
-      <div className="idea-card">
-        <h2 className="dash-h2" style={{ marginTop: 0 }}>
-          3 · Session XP board
-        </h2>
-        <p className="p2-desc">
-          Weighted blend — result 30%, execution 25%, improvement 20%, team 15%,
-          creativity 5%, sportsmanship 5%. The challenge winner isn&apos;t
-          automatically the XP winner.
+      <div className="pw-card">
+        <div className="pw-cardhead">
+          <span className="pw-step">3</span>
+          <h2>Session XP board</h2>
+        </div>
+        <p className="pw-cardsub">
+          Result 30% · execution 25% · improvement 20% · team 15% · creativity 5%
+          · sportsmanship 5% — the challenge winner isn&apos;t automatically the
+          XP winner.
         </p>
 
         <div className="p4-scroll">
@@ -523,36 +523,25 @@ export default function DrillsPage() {
           </table>
         </div>
 
-        <div className="p4-scroll">
-          <table className="p4-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th className="name-cell">Player</th>
-                <th>XP</th>
-                <th>Top contributor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {xpBoard.map((p) => {
-                const top = (
-                  Object.entries(p.breakdown) as Array<[string, number]>
-                ).sort((a, b) => b[1] - a[1])[0];
-                return (
-                  <tr key={p.playerId}>
-                    <td>
-                      <b>#{p.rank}</b>
-                    </td>
-                    <td className="name-cell">{p.name}</td>
-                    <td>
-                      <b>{p.xp.toFixed(2)}</b>
-                    </td>
-                    <td>{top ? `${top[0]} (+${top[1].toFixed(1)})` : "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div style={{ marginTop: 14 }}>
+          {xpBoard.map((p) => {
+            const top = (
+              Object.entries(p.breakdown) as Array<[string, number]>
+            ).sort((a, b) => b[1] - a[1])[0];
+            return (
+              <div className="xp-row" key={p.playerId}>
+                <span className={medalClass(p.rank)}>{p.rank}</span>
+                <span className="xp-name">{p.name}</span>
+                <div className="meter">
+                  <span style={{ width: `${p.xp}%` }} />
+                </div>
+                <span className="xp-val">{p.xp.toFixed(1)}</span>
+                <span className="xp-top">
+                  top: {top ? `${top[0]} +${top[1].toFixed(1)}` : "—"}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

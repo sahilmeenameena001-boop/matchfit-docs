@@ -39,6 +39,10 @@ const num = (v: string, fallback: number) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+/** Equity meter geometry: the bar spans 0–1.3× of squad average. */
+const METER_MAX = 1.3;
+const pct = (v: number) => `${Math.min(100, Math.max(0, (v / METER_MAX) * 100))}%`;
+
 export default function MatchesPage() {
   /* ------------------------- §7.1 rotation state ------------------------- */
   const [players, setPlayers] = useState<PlayerRow[]>(DEFAULT_PLAYERS);
@@ -113,15 +117,20 @@ export default function MatchesPage() {
 
       {/* ---------------------- §7.1 rotation planner ---------------------- */}
       <form
-        className="idea-card"
+        className="pw-card"
         onSubmit={(e) => {
           e.preventDefault();
           generateRotation();
         }}
       >
-        <h2 className="dash-h2" style={{ marginTop: 0 }}>
-          1 · Squad rotation — minutes equity
-        </h2>
+        <div className="pw-cardhead">
+          <span className="pw-step">1</span>
+          <h2>Squad rotation — fair minutes</h2>
+        </div>
+        <p className="pw-cardsub">
+          Field {onPitch || 4} every interval, rotate the bench, keep everyone
+          inside the 0.90–1.10 equity band.
+        </p>
         {rotErr && <div className="form-error">{rotErr}</div>}
 
         <div className="row">
@@ -198,13 +207,20 @@ export default function MatchesPage() {
 
         {plan && (
           <>
-            {plan.allWithinBand && (
-              <div className="info-ok" style={{ marginTop: 16 }}>
-                ✓ Every player finishes inside the {plan.equityBand.min.toFixed(2)}–
-                {plan.equityBand.max.toFixed(2)} equity band (variance{" "}
-                {plan.variance.toFixed(4)}).
-              </div>
-            )}
+            <div className="pw-banner">
+              <span className={`p4-badge ${plan.allWithinBand ? "ok" : "bad"}`}>
+                {plan.allWithinBand ? "✓ everyone in the band" : "band breached"}
+              </span>
+              <span>
+                <span className="big">{plan.intervals.length}</span>{" "}
+                <span className="lbl">intervals</span>
+              </span>
+              <span>
+                <span className="big">{plan.variance.toFixed(3)}</span>{" "}
+                <span className="lbl">equity variance (lower = fairer)</span>
+              </span>
+            </div>
+
             <div className="p4-scroll">
               <table className="p4-table">
                 <thead>
@@ -226,7 +242,7 @@ export default function MatchesPage() {
                           key={iv.index}
                           className={iv.onPitch.includes(p.id) ? "p4-on" : "p4-bench"}
                         >
-                          {iv.onPitch.includes(p.id) ? "ON" : "SUB"}
+                          {iv.onPitch.includes(p.id) ? "⚽ ON" : "SUB"}
                         </td>
                       ))}
                     </tr>
@@ -243,7 +259,7 @@ export default function MatchesPage() {
                     <th>History</th>
                     <th>This match</th>
                     <th>Total</th>
-                    <th>Equity</th>
+                    <th>Equity vs squad avg</th>
                     <th>Band</th>
                   </tr>
                 </thead>
@@ -253,8 +269,19 @@ export default function MatchesPage() {
                       <td className="name-cell">{p.name}</td>
                       <td>{p.historicalMinutes}&apos;</td>
                       <td>{p.sessionMinutes}&apos;</td>
-                      <td>{p.totalMinutes}&apos;</td>
-                      <td>{p.equity.toFixed(2)}×</td>
+                      <td>
+                        <b>{p.totalMinutes}&apos;</b>
+                      </td>
+                      <td>
+                        <div className="equity-wrap">
+                          <div className={`meter ${p.withinBand ? "" : "warn"}`}>
+                            <span style={{ width: pct(p.equity) }} />
+                            <i className="band" style={{ left: pct(plan.equityBand.min) }} />
+                            <i className="band" style={{ left: pct(plan.equityBand.max) }} />
+                          </div>
+                          <b>{p.equity.toFixed(2)}×</b>
+                        </div>
+                      </td>
                       <td>
                         <span className={`p4-badge ${p.withinBand ? "ok" : "bad"}`}>
                           {p.withinBand ? "in band" : "outside"}
@@ -278,15 +305,20 @@ export default function MatchesPage() {
 
       {/* ---------------------- §7.2 match scheduler ----------------------- */}
       <form
-        className="idea-card"
+        className="pw-card"
         onSubmit={(e) => {
           e.preventDefault();
           generateSchedule();
         }}
       >
-        <h2 className="dash-h2" style={{ marginTop: 0 }}>
-          2 · Match schedule — round robin
-        </h2>
+        <div className="pw-cardhead">
+          <span className="pw-step">2</span>
+          <h2>Match schedule — round robin</h2>
+        </div>
+        <p className="pw-cardsub">
+          Competitive fixtures on limited pitches: no long waits, no repeat
+          match-ups, no blowouts.
+        </p>
         {schedErr && <div className="form-error">{schedErr}</div>}
 
         <label>Squads ({squads.length} — rating = squad strength, e.g. average Elo)</label>
@@ -361,11 +393,14 @@ export default function MatchesPage() {
 
         {schedule && (
           <>
-            <div className="p4-chips">
-              <span className="pillar-chip">
-                <b>cost {schedule.cost.total.toFixed(1)}</b>
-                {schedule.method === "annealed" &&
-                  ` (template ${schedule.templateCost.toFixed(1)})`}
+            <div className="pw-banner">
+              <span>
+                <span className="big">{schedule.cost.total.toFixed(1)}</span>{" "}
+                <span className="lbl">
+                  schedule cost
+                  {schedule.method === "annealed" &&
+                    ` (greedy template: ${schedule.templateCost.toFixed(1)})`}
+                </span>
               </span>
               <span className="pillar-chip">rest {schedule.cost.rest.toFixed(1)}</span>
               <span className="pillar-chip">wait {schedule.cost.wait.toFixed(1)}</span>
@@ -375,37 +410,26 @@ export default function MatchesPage() {
               </span>
             </div>
 
-            <div className="p4-scroll">
-              <table className="p4-table">
-                <thead>
-                  <tr>
-                    <th>Round</th>
-                    {schedule.rounds[0]?.matches.map((m) => (
-                      <th key={m.pitch}>Pitch {m.pitch}</th>
-                    ))}
-                    <th>Resting</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {schedule.rounds.map((r) => (
-                    <tr key={r.round}>
-                      <td>
-                        <b>R{r.round}</b>
-                      </td>
-                      {r.matches.map((m) => (
-                        <td key={m.pitch}>
-                          {squadName(m.squadA)} vs {squadName(m.squadB)}
-                          <span style={{ color: "var(--muted)" }}>
-                            {" "}
-                            (Δ{m.ratingGap})
-                          </span>
-                        </td>
-                      ))}
-                      <td>{r.resting.map(squadName).join(", ") || "—"}</td>
-                    </tr>
+            <div>
+              {schedule.rounds.map((r) => (
+                <div className="fixture-round" key={r.round}>
+                  <span className="fixture-rlabel">R{r.round}</span>
+                  {r.matches.map((m) => (
+                    <span className="fixture" key={m.pitch}>
+                      <span className="lbl" style={{ color: "var(--muted)", fontSize: "0.72rem" }}>
+                        P{m.pitch}
+                      </span>
+                      <b>{squadName(m.squadA)}</b>
+                      <span className="vs">VS</span>
+                      <b>{squadName(m.squadB)}</b>
+                      <span className="gap">Δ{m.ratingGap}</span>
+                    </span>
                   ))}
-                </tbody>
-              </table>
+                  <span className="fixture-rest">
+                    😴 {r.resting.map(squadName).join(", ") || "—"}
+                  </span>
+                </div>
+              ))}
             </div>
 
             <div className="p4-scroll">
