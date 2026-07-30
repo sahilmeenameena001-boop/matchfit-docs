@@ -113,10 +113,12 @@ team contribution 0.15, creativity 0.05, sportsmanship 0.05 (each component 0–
 `rankByXP()` orders players by the blend — so the challenge winner and the top XP scorer
 can legitimately be different players, which is the point of the model.
 
-## Wiring status
+## Where it surfaces
 
-Session plans (`session_plans.challenges` jsonb) are ready to receive
-`selectChallenges()` output via `POST /api/plans/generate` once squad rosters live in
-the DB — same TODO as the Pillar 4 engine. A `/drills` dashboard page (the "make it
-working" step) can run all of this locally in the browser, like `/matches` does for
-Pillar 4.
+- **Page:** [`/drills`](../src/app/(dashboard)/drills/page.tsx) — staff workspace, runs
+  the engine locally in the browser (no login / DB needed, like `/matches` for Pillar 4):
+  challenge picker with score breakdowns, live attempt scoring with the anti-gaming
+  rules, and the weighted XP board.
+- **Session plans:** `session_plans.challenges` (jsonb) is ready to receive
+  `selectChallenges()` output via `POST /api/plans/generate` once squad rosters live in
+  the DB — same TODO as the Pillar 4 engine.

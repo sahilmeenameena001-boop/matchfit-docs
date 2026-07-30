@@ -912,3 +912,73 @@ textarea {
 .p4-warnings li {
   margin-bottom: 3px;
 }
+
+/* ---------- Pillar 2 · gamified drills ---------- */
+.p2-chiprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 14px;
+}
+.p2-chiprow button {
+  border: 1px solid var(--rule);
+  background: #fff;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.p2-chiprow button.on {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: 600;
+}
+.p2-pickcard {
+  background: #f0f4f2;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 10px 0;
+}
+.p2-pickhead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.p2-pickhead h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--navy);
+}
+.p2-desc {
+  color: var(--muted);
+  font-size: 0.83rem;
+  margin: 6px 0;
+}
+.p2-attempt-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.p2-attempt-btns button {
+  border: 1px solid var(--rule);
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.p2-attempt-btns button:hover {
+  border-color: var(--green);
+  color: var(--green-dark);
+}
+.p2-xp-input {
+  width: 64px;
+  padding: 6px 4px;
+  font-size: 0.85rem;
+  text-align: center;
+}
