@@ -11,14 +11,14 @@ import { updatePlanSchema } from "@/lib/validation/pillarFeatures";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const db = createAdminClient();
     const { data, error } = await db
       .from("session_plans")
       .select("*")
-      .eq("session_id", params.sessionId)
+      .eq("session_id", (await params).sessionId)
       .maybeSingle();
     if (error || !data) return ok(null); // no plan yet / not configured
     // Drafts are visible only to staff.
@@ -34,7 +34,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const staff = await getStaff();
   if (!staff) return fail("UNAUTHORIZED", "Staff login required.", 401);
@@ -70,7 +70,7 @@ export async function PATCH(
     const { data, error } = await db
       .from("session_plans")
       .update(update)
-      .eq("session_id", params.sessionId)
+      .eq("session_id", (await params).sessionId)
       .select("*")
       .maybeSingle();
     if (error) return fail("DATABASE_ERROR", error.message, 500);

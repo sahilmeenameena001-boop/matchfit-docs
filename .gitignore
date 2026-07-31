@@ -17,6 +17,10 @@
 *.tsbuildinfo
 next-env.d.ts
 
+# playlab local database
+prisma/dev.db
+prisma/dev.db-journal
+
 # logs
 npm-debug.log*
 yarn-error.log*

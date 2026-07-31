@@ -12,7 +12,7 @@ export type Staff = { id: string; role: string; active: boolean };
  */
 export async function getStaff(): Promise<Staff | null> {
   try {
-    const supa = createServerSupabaseClient();
+    const supa = await createServerSupabaseClient();
     const {
       data: { user },
     } = await supa.auth.getUser();

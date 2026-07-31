@@ -10,7 +10,7 @@ import { updateCalendarSchema } from "@/lib/validation/pillarFeatures";
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const staff = await getStaff();
   if (!staff) return fail("UNAUTHORIZED", "Staff login required.", 401);
@@ -45,7 +45,7 @@ export async function PATCH(
     const { data, error } = await db
       .from("pillar_calendar")
       .update(update)
-      .eq("id", params.id)
+      .eq("id", (await params).id)
       .select("*")
       .maybeSingle();
     if (error) return fail("DATABASE_ERROR", error.message, 500);
