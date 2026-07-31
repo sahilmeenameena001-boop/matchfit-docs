@@ -1,0 +1,227 @@
+// MatchFIT PlayLab — SQLite for local dev; swap provider to postgresql later.
+// SQLite notes: no native enums (statuses are validated strings), no Json
+// column type (flexible value maps live in *Json String fields, parsed by
+// lib/serialize.ts). Structured game data (rules, scoring, XP) stays in real
+// relational models — never one JSON blob per drill.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Coach {
+  id       String    @id @default(cuid())
+  name     String
+  sessions Session[]
+}
+
+model Team {
+  id      String  @id @default(cuid())
+  name    String
+  color   String
+  players Player[]
+  results TeamDrillResult[]
+  events  DrillEvent[]
+}
+
+model Player {
+  id       String  @id @default(cuid())
+  name     String
+  position String
+  xpTotal  Int     @default(0)
+  teamId   String?
+  team     Team?   @relation(fields: [teamId], references: [id])
+
+  sessionEntries SessionPlayer[]
+  results        PlayerDrillResult[]
+  events         DrillEvent[]
+  playerOfRuns   DrillRun[]          @relation("PlayerOfDrill")
+}
+
+model Session {
+  id                 String  @id @default(cuid())
+  title              String
+  date               String
+  venue              String
+  durationMin        Int
+  pitch              String
+  playerLevel        String
+  primaryObjective   String
+  secondaryObjective String
+  targetIntensity    String
+  coachNotes         String  @default("")
+  equipmentJson      String  @default("[]")
+  status             String  @default("generated")
+  xpTargetMin        Int     @default(50)
+  xpTargetMax        Int     @default(120)
+  coachId            String?
+  coach              Coach?  @relation(fields: [coachId], references: [id])
+
+  players SessionPlayer[]
+  drills  SessionDrill[]
+}
+
+model SessionPlayer {
+  id        String  @id @default(cuid())
+  sessionId String
+  playerId  String
+  session   Session @relation(fields: [sessionId], references: [id])
+  player    Player  @relation(fields: [playerId], references: [id])
+
+  @@unique([sessionId, playerId])
+}
+
+model Drill {
+  id        String @id @default(cuid())
+  name      String
+  pillar    String
+  status    String @default("library")
+  summary   String
+  novelty   Float  @default(0.5)
+  intensity String
+  complexity String
+  space     String
+  conceptType    String?
+  selectionScore Float   @default(0)
+  sourceDrillId  String?
+
+  equipmentJson  String @default("[]")
+  mechanicsJson  String @default("[]")
+  objectivesJson String @default("{}") // Record<SessionDimension, 0..5>
+  constraintsJson String @default("{}") // DrillConstraints
+  setupJson      String @default("[]") // setup instructions
+  progressionJson String @default("[]")
+  regressionJson  String @default("[]")
+  safetyJson      String @default("[]")
+  contentMoment   String @default("")
+  fitExplanation  String @default("")
+
+  rules        DrillRule[]
+  scoringRules ScoringRule[]
+  xpRules      XPRule[]
+  sessionUses  SessionDrill[]
+}
+
+model DrillRule {
+  id           String  @id @default(cuid())
+  drillId      String
+  drill        Drill   @relation(fields: [drillId], references: [id])
+  category     String // start|action|success|bonus|penalty|progression|tiebreak
+  title        String
+  description  String  @default("")
+  enabled      Boolean @default(true)
+  sortOrder    Int     @default(0)
+  paramsJson   String  @default("{}")
+  depsJson     String  @default("[]") // rule ids this depends on
+  conflictsJson String @default("[]") // rule ids this conflicts with
+}
+
+model ScoringRule {
+  id             String  @id @default(cuid())
+  drillId        String
+  drill          Drill   @relation(fields: [drillId], references: [id])
+  eventType      String
+  label          String
+  points         Int
+  appliesTo      String  @default("player") // player|team
+  maxOccurrences Int?
+  enabled        Boolean @default(true)
+}
+
+model XPRule {
+  id              String  @id @default(cuid())
+  drillId         String
+  drill           Drill   @relation(fields: [drillId], references: [id])
+  sourceEventType String // scoring eventType, or participation/roundWin/...
+  label           String
+  xp              Int
+  category        String // participation|performance|improvement|teamwork|fairPlay|personalBest
+  dailyCap        Int?
+  enabled         Boolean @default(true)
+}
+
+model SessionDrill {
+  id          String  @id @default(cuid())
+  sessionId   String
+  drillId     String
+  session     Session @relation(fields: [sessionId], references: [id])
+  drill       Drill   @relation(fields: [drillId], references: [id])
+  sortOrder   Int     @default(0)
+  durationMin Int     @default(15)
+  status      String  @default("planned") // planned|running|done
+  runs        DrillRun[]
+}
+
+model DrillRun {
+  id             String    @id @default(cuid())
+  sessionDrillId String
+  sessionDrill   SessionDrill @relation(fields: [sessionDrillId], references: [id])
+  startedAt      DateTime  @default(now())
+  endedAt        DateTime?
+  rounds         Int       @default(1)
+  playerOfDrillId String?
+  playerOfDrill   Player?  @relation("PlayerOfDrill", fields: [playerOfDrillId], references: [id])
+
+  events  DrillEvent[]
+  players PlayerDrillResult[]
+  teams   TeamDrillResult[]
+  review  DrillReview?
+}
+
+model DrillEvent {
+  id        String   @id @default(cuid())
+  runId     String
+  run       DrillRun @relation(fields: [runId], references: [id])
+  at        DateTime @default(now())
+  round     Int      @default(1)
+  eventType String
+  label     String
+  points    Int      @default(0)
+  xp        Int      @default(0)
+  playerId  String?
+  player    Player?  @relation(fields: [playerId], references: [id])
+  teamId    String?
+  team      Team?    @relation(fields: [teamId], references: [id])
+}
+
+model PlayerDrillResult {
+  id         String   @id @default(cuid())
+  runId      String
+  run        DrillRun @relation(fields: [runId], references: [id])
+  playerId   String
+  player     Player   @relation(fields: [playerId], references: [id])
+  drillScore Int      @default(0)
+  xp         Int      @default(0)
+}
+
+model TeamDrillResult {
+  id         String   @id @default(cuid())
+  runId      String
+  run        DrillRun @relation(fields: [runId], references: [id])
+  teamId     String
+  team       Team     @relation(fields: [teamId], references: [id])
+  drillScore Int      @default(0)
+}
+
+model DrillReview {
+  id                String   @id @default(cuid())
+  runId             String   @unique
+  run               DrillRun @relation(fields: [runId], references: [id])
+  easeOfExplanation Int
+  playerEnjoyment   Int
+  objectiveAchieved Int
+  scoringClarity    Int
+  operationalEase   Int
+  contentQuality    Int
+  safety            Int
+  actualDurationMin Int
+  attemptsPerPlayer Float
+  queueIssue        Boolean
+  notes             String   @default("")
+  runAgain          Boolean
+  recommendation    String   @default("")
+}
